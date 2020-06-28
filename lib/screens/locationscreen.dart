@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:map_news/components/newscache.dart';
+import 'package:map_news/screens/mapnews.dart';
 
 class LocationScreen extends StatefulWidget {
   @override
@@ -14,6 +16,8 @@ class _LocationScreenState extends State<LocationScreen> {
   Completer<GoogleMapController> _controller = Completer();
 
   LatLng position;
+
+  var feature;
 
   Marker myMarker;
 
@@ -77,6 +81,15 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     myMarker = Marker(
+        infoWindow: InfoWindow(
+          title: "Tap to See News",
+          snippet: feature.toString(),
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => MapNews(location: feature,newslist: NewsCache.news,)
+            ));
+          }
+        ),
         markerId: new MarkerId("myMarker"),
         position: position,
         onTap: () async {
@@ -86,21 +99,30 @@ class _LocationScreenState extends State<LocationScreen> {
           var loc =
               await Geocoder.local.findAddressesFromCoordinates(coordinates);
 
+          setState(() {
+            feature = loc.first.adminArea ?? loc.first.countryCode;
+          });
+
+          NewsCache.getNews(location: feature);
 
 
         });
     return GoogleMap(
       zoomControlsEnabled: false,
-      mapType: MapType.hybrid,
+      mapType: MapType.normal,
       initialCameraPosition: _kGooglePlex,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
       },
       onTap: (value) async {
         print(value);
+        var loc = await Geocoder.local.findAddressesFromCoordinates(Coordinates(value.latitude,value.longitude));
+
         setState(() {
+          feature = loc.first.adminArea ?? loc.first.countryCode;
           position = value;
         });
+
       },
       markers: Set.from([myMarker]),
     );

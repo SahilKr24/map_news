@@ -8,7 +8,7 @@ import 'package:map_news/components/widget.dart';
 
 var lock = false;
 
-Future<List<dynamic>> getCategory(String category) async {
+Future<List<News>> getCategory(String category) async {
   if (lock) {
     return [];
   }
@@ -25,6 +25,7 @@ Future<List<dynamic>> getCategory(String category) async {
 
 class NewsScreen extends StatefulWidget {
   final location;
+
   NewsScreen({this.location});
 
   @override
@@ -53,32 +54,34 @@ class _NewsScreenState extends State<NewsScreen> {
   ];
 
   getLists() async {
-    business = await compute(getCategory, "business");
-    entertainment = await compute(getCategory, "entertainment");
-    general = await compute(getCategory, "general");
-    health = await compute(getCategory, "health");
-    science = await compute(getCategory, "science");
-    sports = await compute(getCategory, "sports");
-    technology = await compute(getCategory, "technology");
-    finalList = [
-      general,
-      entertainment,
-      business,
-      health,
-      science,
-      sports,
-      technology
-    ];
+     business = await getCategory("business");
+     entertainment = await getCategory("entertainment");
+     general = await getCategory("general");
+     health = await getCategory("health");
+     science = await getCategory("science");
+     sports = await getCategory("sports");
+     technology = await getCategory("technology");
+
     if (lock) {
       return 0;
     }
     setState(() {
+      finalList = [
+        general,
+        entertainment,
+        business,
+        health,
+        science,
+        sports,
+        technology
+      ];
       newsloaded = true;
     });
   }
 
   @override
   void initState() {
+    lock = false;
     newsloaded = false;
     getLists();
     super.initState();
@@ -93,7 +96,7 @@ class _NewsScreenState extends State<NewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        child: !newsloaded
+        child: !(newsloaded)
             ? Center(
                 child: CircularProgressIndicator(),
               )
