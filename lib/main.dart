@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'widget.dart';
+import 'package:map_news/screens/locationscreen.dart';
+import 'package:map_news/models/news.dart';
+import 'package:map_news/screens/newsscreen.dart';
+import 'components/widget.dart';
+import 'package:http/http.dart' as http;
 void main() {
   runApp(MyApp());
 }
@@ -11,14 +15,34 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  var news = List<News>();
+
+  int index = 0;
+
+  var body = [NewsScreen(),LocationScreen()];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          child: NewsTile(
+            child: body[index]
           ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.map),
+          onPressed: () {
+            setState(() {
+              index = index == 0 ? 1 : 0;
+            });
+          },
         ),
       ),
     );

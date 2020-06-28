@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:map_news/models/news.dart';
 
-List<News> newsList = [News()];
 
 class NewsTile extends StatelessWidget {
+  final newsList;
+
+  NewsTile({@required this.newsList});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -45,26 +48,33 @@ class NewsTile extends StatelessWidget {
                             children: <Widget>[
                               Text(
                                 news.title??'title yaha',
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
                                 style: TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.2,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 2.0),
                               Text(
                                 news.description??'desc yaha',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 18,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w600
                                 ),
                               ),
+
                               SizedBox(height: 2.0),
                               Text(
-                                'time & publisher yaha',
+                                '${news.publishedAt} ${news.author}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w600,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w600
                                 ),
                               ),
                             ],
