@@ -31,8 +31,6 @@ class News {
 
   @override
   String toString() {
-    // TODO: implement toString
     return (title);
-    return super.toString();
   }
 }

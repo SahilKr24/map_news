@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,12 +9,12 @@ import 'package:map_news/components/widget.dart';
 var lock = false;
 
 Future<List<dynamic>> getCategory(String category) async {
-  if (lock){
+  if (lock) {
     return [];
   }
   var list = List<News>();
   var response = await http.get(
-      'https://newsapi.org/v2/top-headlines?category=${category}&country=in&apiKey=c3331ea850994b449943e957ef2e6f05');
+      'https://newsapi.org/v2/top-headlines?category=${category}&pageSize=10&country=in&apiKey=16d1ef027190474ebd9f2bd76ddabc8b');
   if (response.statusCode == 200) {
     jsonDecode(response.body)['articles']
         .forEach((e) => list.add(News.fromJson(e)));
@@ -41,18 +41,35 @@ class _NewsScreenState extends State<NewsScreen> {
   var science;
   var sports;
   var technology;
+  var finalList;
+  var category = [
+    "General",
+    "Entertainment",
+    "Business",
+    "Health",
+    "Science",
+    "Sports",
+    "Technology"
+  ];
 
-
-
-   getLists() async {
-    business = await compute(getCategory,"business");
-    entertainment = await compute(getCategory,"entertainment");
-    general = await compute(getCategory,"general");
-    health = await compute(getCategory,"health");
-    science = await compute(getCategory,"science");
+  getLists() async {
+    business = await compute(getCategory, "business");
+    entertainment = await compute(getCategory, "entertainment");
+    general = await compute(getCategory, "general");
+    health = await compute(getCategory, "health");
+    science = await compute(getCategory, "science");
     sports = await compute(getCategory, "sports");
     technology = await compute(getCategory, "technology");
-    if(lock){
+    finalList = [
+      general,
+      entertainment,
+      business,
+      health,
+      science,
+      sports,
+      technology
+    ];
+    if (lock) {
       return 0;
     }
     setState(() {
@@ -62,7 +79,6 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     newsloaded = false;
     getLists();
     super.initState();
@@ -70,30 +86,29 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     lock = true;
     super.dispose();
-
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: !newsloaded
-          ? Center(child: CircularProgressIndicator(),)
-          : SingleChildScrollView(
-            child: Column(
-              children: [
-                NewsTile(newsList: business),
-                NewsTile(newsList: technology,),
-                NewsTile(newsList: science,),
-                NewsTile(newsList: health,),
-                NewsTile(newsList: entertainment,),
-                NewsTile(newsList: sports,)
-              ],
-            ),
-          )
-    );
+        child: !newsloaded
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Swiper(
+                itemCount: finalList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return NewsTile(
+                    newsList: finalList[index],
+                    category: category[index],
+                  );
+                },
+                control: SwiperControl(),
+                pagination: SwiperPagination(),
+                viewportFraction: 0.80,
+                scale: 0.9,
+              ));
   }
 }
